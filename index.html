@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protótipo B — sampler com efeitos (javascript, alojado fora do RC)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#E7E3D4;font-family:'Inter',sans-serif;color:#14110E}
+.page{position:relative;max-width:900px;margin:0 auto;min-height:100vh;background:#F8F8F1;padding:5vw 6vw 8vw 7vw}
+.bar{position:absolute;left:0;top:0;bottom:0;width:16px;background:#4419B6}
+.ptitle{font-family:'Fredoka',sans-serif;font-weight:700;color:#4419B6;font-size:56px;line-height:.95;margin:0 0 14px}
+.pintro{font-size:17px;line-height:1.55;max-width:640px;margin:0 0 8px}
+.dica{font-family:'Space Mono',monospace;font-size:13px;color:#6b6657;margin:0 0 20px}
+.modos{display:flex;gap:10px;margin:0 0 22px;flex-wrap:wrap}
+.modo{font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;color:#4419B6;border:2px solid #4419B6;border-radius:30px;padding:8px 18px;background:none;cursor:pointer}
+.modo.sel{background:#4419B6;color:#F8F8F1}
+.grelha{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:640px){.grelha{grid-template-columns:repeat(2,1fr)}}
+.tecla{position:relative;border-radius:12px;border:3px solid #14110E;min-height:130px;padding:12px;cursor:pointer;
+ display:flex;flex-direction:column;justify-content:space-between;user-select:none;-webkit-user-select:none;
+ transition:transform .06s ease, box-shadow .06s ease, background .12s ease;touch-action:manipulation}
+.tecla:nth-child(odd){background:#FF3B24;color:#F8F8F1}
+.tecla:nth-child(even){background:#4419B6;color:#F8F8F1}
+.tecla.premida{transform:translateY(4px) scale(.97)}
+.tecla.ligada{background:#14110E !important;box-shadow:0 0 0 4px #F8F8F1 inset}
+.tecla.ligada .tnum::after{content:" ●";font-size:.45em;vertical-align:middle}
+.tnum{font-family:'Fredoka',sans-serif;font-weight:700;font-size:40px;line-height:1;pointer-events:none}
+.tmeta{font-family:'Space Mono',monospace;font-size:11px;opacity:.85;pointer-events:none}
+.kbd{position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:13px;background:#F8F8F1;color:#14110E;border-radius:6px;padding:2px 7px;pointer-events:none}
+.fxrow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+@media (max-width:640px){.fxrow{grid-template-columns:repeat(3,1fr)}}
+.fx{position:relative;border-radius:12px;border:3px dashed #14110E;min-height:86px;padding:12px;cursor:pointer;
+ background:#F8F8F1;color:#14110E;display:flex;flex-direction:column;justify-content:space-between;user-select:none;-webkit-user-select:none;
+ transition:background .12s ease, transform .06s ease;touch-action:manipulation}
+.fx .tnum{font-size:24px}
+.fx.ligada{background:#14110E;color:#F8F8F1;border-style:solid}
+.fx .kbd{background:#14110E;color:#F8F8F1}
+.fx.ligada .kbd{background:#F8F8F1;color:#14110E}
+.controlos{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;color:#4419B6;border:2px solid #4419B6;border-radius:30px;padding:8px 18px;background:none;cursor:pointer}
+.btn:hover{background:#4419B6;color:#F8F8F1}
+.nota{margin-top:30px;font-size:13px;color:#6b6657;max-width:640px;line-height:1.5}
+</style></head><body>
+<div class="page">
+<div class="bar"></div>
+<div class="ptitle">sampler</div>
+<p class="pintro">Toca nas teclas — ou usa <strong>A&nbsp;S&nbsp;D&nbsp;F&nbsp;G&nbsp;H&nbsp;J&nbsp;K</strong>. Efeitos: <strong>1</strong> delay · <strong>2</strong> reverb · <strong>3</strong> reverse.</p>
+<div class="modos">
+<button class="modo sel" id="mInt">interruptor — clica: dá som · clica outra vez: pára</button>
+<button class="modo" id="mDis">disparo — cada toque dispara uma vez</button>
+</div>
+<p class="dica">protótipo B — web audio, teria de viver fora do Research Catalogue (ex.: GitHub Pages, com link a partir da entrada)</p>
+<div class="grelha" id="grelha"></div>
+<div class="fxrow">
+<div class="fx" id="fxDelay"><span class="kbd">1</span><span class="tnum">delay</span><span class="tmeta">eco · 350ms · feedback</span></div>
+<div class="fx" id="fxReverb"><span class="kbd">2</span><span class="tnum">reverb</span><span class="tmeta">cauda de 2,5s</span></div>
+<div class="fx" id="fxReverse"><span class="kbd">3</span><span class="tnum">reverse</span><span class="tmeta">os sons tocam ao contrário</span></div>
+</div>
+<div class="controlos"><button class="btn" id="pararTudo">parar tudo</button></div>
+<p class="nota">No modo <strong>interruptor</strong> cada tecla é uma camada em loop que se soma às outras. Os efeitos aplicam-se à mesa inteira: o delay e o reverb entram e saem suavemente; o reverse inverte as camadas ligadas no momento e tudo o que se disparar a seguir. Oito momentos do soundwalk com a casa dos rapazes (4s cada).</p>
+</div>
+<script>
+const SONS=[
+ {f:'s1.mp3',t:'00:12',k:'a'},{f:'s2.mp3',t:'01:35',k:'s'},
+ {f:'s3.mp3',t:'03:00',k:'d'},{f:'s4.mp3',t:'04:20',k:'f'},
+ {f:'s5.mp3',t:'05:40',k:'g'},{f:'s6.mp3',t:'07:10',k:'h'},
+ {f:'s7.mp3',t:'08:40',k:'j'},{f:'s8.mp3',t:'10:05',k:'k'}];
+let modo='int', reversed=false, ctx=null;
+let bus, delayNode, delayFb, delayGain, convolver, revGain;
+const buffers=[], buffersRev=[], loops=new Map(), oneshots=new Set(), teclas=[];
+
+async function initAudio(){
+  if(ctx) return;
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  bus=ctx.createGain();
+  // dry
+  bus.connect(ctx.destination);
+  // delay (send)
+  delayNode=ctx.createDelay(2); delayNode.delayTime.value=.35;
+  delayFb=ctx.createGain(); delayFb.gain.value=.45;
+  delayGain=ctx.createGain(); delayGain.gain.value=0;
+  bus.connect(delayNode); delayNode.connect(delayFb); delayFb.connect(delayNode);
+  delayNode.connect(delayGain); delayGain.connect(ctx.destination);
+  // reverb (send) — impulso sintético de 2,5s
+  convolver=ctx.createConvolver();
+  const dur=2.5, rate=ctx.sampleRate, len=dur*rate;
+  const ir=ctx.createBuffer(2,len,rate);
+  for(let c=0;c<2;c++){const d=ir.getChannelData(c);
+    for(let i=0;i<len;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.8);}}
+  convolver.buffer=ir;
+  revGain=ctx.createGain(); revGain.gain.value=0;
+  bus.connect(convolver); convolver.connect(revGain); revGain.connect(ctx.destination);
+  // carregar e inverter buffers
+  for(let i=0;i<SONS.length;i++){
+    const r=await fetch(SONS[i].f); const ab=await r.arrayBuffer();
+    const b=await ctx.decodeAudioData(ab);
+    buffers[i]=b;
+    const rb=ctx.createBuffer(b.numberOfChannels,b.length,b.sampleRate);
+    for(let c=0;c<b.numberOfChannels;c++){
+      const src=b.getChannelData(c), dst=rb.getChannelData(c);
+      for(let j=0;j<b.length;j++) dst[j]=src[b.length-1-j];
+    }
+    buffersRev[i]=rb;
+  }
+}
+function buf(i){return reversed?buffersRev[i]:buffers[i];}
+function voz(i,loop){
+  const s=ctx.createBufferSource(); s.buffer=buf(i); s.loop=loop;
+  s.connect(bus); s.start(); return s;
+}
+async function toca(i){
+  await initAudio(); if(ctx.state==='suspended') await ctx.resume();
+  if(modo==='int'){
+    if(loops.has(i)){ loops.get(i).stop(); loops.delete(i); teclas[i].classList.remove('ligada'); }
+    else{ loops.set(i,voz(i,true)); teclas[i].classList.add('ligada'); }
+  }else{
+    const s=voz(i,false); oneshots.add(s);
+    s.onended=()=>oneshots.delete(s);
+    teclas[i].classList.add('premida');
+    setTimeout(()=>teclas[i].classList.remove('premida'),120);
+  }
+}
+// teclas de som
+const g=document.getElementById('grelha');
+SONS.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='tecla';
+  d.innerHTML=`<span class="kbd">${s.k.toUpperCase()}</span><span class="tnum">${i+1}</span><span class="tmeta">soundwalk · ${s.t}</span>`;
+  d.addEventListener('pointerdown',()=>toca(i));
+  g.appendChild(d); teclas.push(d);
+});
+// efeitos
+const fxD=document.getElementById('fxDelay'), fxR=document.getElementById('fxReverb'), fxV=document.getElementById('fxReverse');
+async function toggleDelay(){ await initAudio();
+  const on=fxD.classList.toggle('ligada');
+  delayGain.gain.setTargetAtTime(on?0.7:0, ctx.currentTime, .08);
+}
+async function toggleReverb(){ await initAudio();
+  const on=fxR.classList.toggle('ligada');
+  revGain.gain.setTargetAtTime(on?0.9:0, ctx.currentTime, .12);
+}
+async function toggleReverse(){ await initAudio();
+  reversed=!fxV.classList.contains('ligada'); fxV.classList.toggle('ligada');
+  // reiniciar loops activos com o buffer invertido
+  [...loops.keys()].forEach(i=>{ loops.get(i).stop(); loops.set(i,voz(i,true)); });
+}
+fxD.addEventListener('pointerdown',toggleDelay);
+fxR.addEventListener('pointerdown',toggleReverb);
+fxV.addEventListener('pointerdown',toggleReverse);
+// teclado
+document.addEventListener('keydown',ev=>{
+  if(ev.repeat)return;
+  const k=ev.key.toLowerCase();
+  if(k==='1')return void toggleDelay();
+  if(k==='2')return void toggleReverb();
+  if(k==='3')return void toggleReverse();
+  const i=SONS.findIndex(s=>s.k===k);
+  if(i>=0)toca(i);
+});
+// modos e parar
+function pararTudo(){
+  loops.forEach((s,i)=>{try{s.stop()}catch(e){} teclas[i].classList.remove('ligada');}); loops.clear();
+  oneshots.forEach(s=>{try{s.stop()}catch(e){}}); oneshots.clear();
+}
+document.getElementById('pararTudo').addEventListener('click',pararTudo);
+const mI=document.getElementById('mInt'), mD=document.getElementById('mDis');
+mI.addEventListener('click',()=>{modo='int';mI.classList.add('sel');mD.classList.remove('sel');});
+mD.addEventListener('click',()=>{modo='dis';mD.classList.add('sel');mI.classList.remove('sel');pararTudo();});
+</script>
+</body></html>
