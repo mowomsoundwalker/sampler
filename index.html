@@ -1,21 +1,20 @@
 <!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Protótipo B — sampler com efeitos (javascript, alojado fora do RC)</title>
+<title>sampler — Ouvir o Mundo, Ouvir o Outro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;background:#E7E3D4;font-family:'Inter',sans-serif;color:#14110E}
-.page{position:relative;max-width:900px;margin:0 auto;min-height:100vh;background:#F8F8F1;padding:5vw 6vw 8vw 7vw}
+.page{position:relative;max-width:980px;margin:0 auto;min-height:100vh;background:#F8F8F1;padding:5vw 6vw 8vw 7vw}
 .bar{position:absolute;left:0;top:0;bottom:0;width:16px;background:#4419B6}
 .ptitle{font-family:'Fredoka',sans-serif;font-weight:700;color:#4419B6;font-size:56px;line-height:.95;margin:0 0 14px}
-.pintro{font-size:17px;line-height:1.55;max-width:640px;margin:0 0 8px}
+.pintro{font-size:17px;line-height:1.55;max-width:640px;margin:0 0 8px;text-align:justify}
 .dica{font-family:'Space Mono',monospace;font-size:13px;color:#6b6657;margin:0 0 20px}
 .modos{display:flex;gap:10px;margin:0 0 22px;flex-wrap:wrap}
 .modo{font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;color:#4419B6;border:2px solid #4419B6;border-radius:30px;padding:8px 18px;background:none;cursor:pointer}
 .modo.sel{background:#4419B6;color:#F8F8F1}
-.grelha{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-@media (max-width:640px){.grelha{grid-template-columns:repeat(2,1fr)}}
-.tecla{position:relative;border-radius:12px;border:3px solid #14110E;min-height:130px;padding:12px;cursor:pointer;
+.grelha{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.tecla{position:relative;border-radius:12px;border:3px solid #14110E;min-height:118px;padding:12px;cursor:pointer;
  display:flex;flex-direction:column;justify-content:space-between;user-select:none;-webkit-user-select:none;
  transition:transform .06s ease, box-shadow .06s ease, background .12s ease;touch-action:manipulation}
 .tecla:nth-child(odd){background:#FF3B24;color:#F8F8F1}
@@ -23,32 +22,31 @@ html,body{margin:0;background:#E7E3D4;font-family:'Inter',sans-serif;color:#1411
 .tecla.premida{transform:translateY(4px) scale(.97)}
 .tecla.ligada{background:#14110E !important;box-shadow:0 0 0 4px #F8F8F1 inset}
 .tecla.ligada .tnum::after{content:" ●";font-size:.45em;vertical-align:middle}
-.tnum{font-family:'Fredoka',sans-serif;font-weight:700;font-size:40px;line-height:1;pointer-events:none}
-.tmeta{font-family:'Space Mono',monospace;font-size:11px;opacity:.85;pointer-events:none}
-.kbd{position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:13px;background:#F8F8F1;color:#14110E;border-radius:6px;padding:2px 7px;pointer-events:none}
-.fxrow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
-@media (max-width:640px){.fxrow{grid-template-columns:repeat(3,1fr)}}
-.fx{position:relative;border-radius:12px;border:3px dashed #14110E;min-height:86px;padding:12px;cursor:pointer;
+.tnum{font-family:'Fredoka',sans-serif;font-weight:700;font-size:26px;line-height:1;pointer-events:none}
+.tmeta{font-family:'Space Mono',monospace;font-size:11px;opacity:.9;pointer-events:none;line-height:1.35}
+.kbd{position:absolute;top:9px;right:9px;font-family:'Space Mono',monospace;font-size:12px;background:#F8F8F1;color:#14110E;border-radius:6px;padding:1px 6px;pointer-events:none}
+.fxrow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.fx{position:relative;border-radius:12px;border:3px dashed #14110E;min-height:82px;padding:12px;cursor:pointer;
  background:#F8F8F1;color:#14110E;display:flex;flex-direction:column;justify-content:space-between;user-select:none;-webkit-user-select:none;
  transition:background .12s ease, transform .06s ease;touch-action:manipulation}
-.fx .tnum{font-size:24px}
+.fx .tnum{font-size:22px}
 .fx.ligada{background:#14110E;color:#F8F8F1;border-style:solid}
 .fx .kbd{background:#14110E;color:#F8F8F1}
 .fx.ligada .kbd{background:#F8F8F1;color:#14110E}
-.controlos{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}
+.controlos{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap}
 .btn{font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;color:#4419B6;border:2px solid #4419B6;border-radius:30px;padding:8px 18px;background:none;cursor:pointer}
 .btn:hover{background:#4419B6;color:#F8F8F1}
-.nota{margin-top:30px;font-size:13px;color:#6b6657;max-width:640px;line-height:1.5}
+.nota{margin-top:28px;font-size:13px;color:#6b6657;max-width:640px;line-height:1.5;text-align:justify}
 </style></head><body>
 <div class="page">
 <div class="bar"></div>
 <div class="ptitle">sampler</div>
-<p class="pintro">Toca nas teclas — ou usa <strong>A&nbsp;S&nbsp;D&nbsp;F&nbsp;G&nbsp;H&nbsp;J&nbsp;K</strong>. Efeitos: <strong>1</strong> delay · <strong>2</strong> reverb · <strong>3</strong> reverse.</p>
+<p class="pintro">Sons das oficinas com a íris inclusiva: balões, bolhinhas, palmas, vozes, risos. Toca nas teclas — ou usa o teclado (<strong>Q&ndash;O</strong> em cima, <strong>A&ndash;L</strong> em baixo). Efeitos: <strong>1</strong> delay · <strong>2</strong> reverb · <strong>3</strong> reverse.</p>
 <div class="modos">
 <button class="modo sel" id="mInt">interruptor — clica: dá som · clica outra vez: pára</button>
 <button class="modo" id="mDis">disparo — cada toque dispara uma vez</button>
 </div>
-<p class="dica">protótipo B — web audio, teria de viver fora do Research Catalogue (ex.: GitHub Pages, com link a partir da entrada)</p>
+<p class="dica">ouvir o mundo, ouvir o outro &middot; arquivo de práticas de escuta comunitárias</p>
 <div class="grelha" id="grelha"></div>
 <div class="fxrow">
 <div class="fx" id="fxDelay"><span class="kbd">1</span><span class="tnum">delay</span><span class="tmeta">eco · 350ms · feedback</span></div>
@@ -56,51 +54,64 @@ html,body{margin:0;background:#E7E3D4;font-family:'Inter',sans-serif;color:#1411
 <div class="fx" id="fxReverse"><span class="kbd">3</span><span class="tnum">reverse</span><span class="tmeta">os sons tocam ao contrário</span></div>
 </div>
 <div class="controlos"><button class="btn" id="pararTudo">parar tudo</button></div>
-<p class="nota">No modo <strong>interruptor</strong> cada tecla é uma camada em loop que se soma às outras. Os efeitos aplicam-se à mesa inteira: o delay e o reverb entram e saem suavemente; o reverse inverte as camadas ligadas no momento e tudo o que se disparar a seguir. Oito momentos do soundwalk com a casa dos rapazes (4s cada).</p>
+<p class="nota">No modo <strong>interruptor</strong> cada tecla é uma camada em loop que se soma às outras — as longas (17, 18) servem de fundo, as curtas de pontuação. No modo <strong>disparo</strong> cada toque lança o som do início, percussivo. Os efeitos aplicam-se à mesa inteira.</p>
 </div>
 <script>
 const SONS=[
- {f:'s1.mp3',t:'00:12',k:'a'},{f:'s2.mp3',t:'01:35',k:'s'},
- {f:'s3.mp3',t:'03:00',k:'d'},{f:'s4.mp3',t:'04:20',k:'f'},
- {f:'s5.mp3',t:'05:40',k:'g'},{f:'s6.mp3',t:'07:10',k:'h'},
- {f:'s7.mp3',t:'08:40',k:'j'},{f:'s8.mp3',t:'10:05',k:'k'}];
+ {f:'c01.mp3',n:'bolhinhas mais simples',k:'q'},
+ {f:'c02.mp3',n:'bolhinhas simples melhor',k:'w'},
+ {f:'c03.mp3',n:'bolhinhas aguádas',k:'e'},
+ {f:'c04.mp3',n:'bolhinhas 3.0',k:'r'},
+ {f:'c05.mp3',n:'pim 1',k:'t'},
+ {f:'c06.mp3',n:'pim mais confuso',k:'y'},
+ {f:'c07.mp3',n:'palmas nas pernas',k:'u'},
+ {f:'c08.mp3',n:'sequência sons',k:'i'},
+ {f:'c09.mp3',n:'xrrruuu',k:'o'},
+ {f:'c10.mp3',n:'xrruuu todes',k:'a'},
+ {f:'c11.mp3',n:'esvaziar do balão',k:'s'},
+ {f:'c12.mp3',n:'balões imitação',k:'d'},
+ {f:'c13.mp3',n:'balões + imitação vozes',k:'f'},
+ {f:'c14.mp3',n:'balões + todes sequência',k:'g'},
+ {f:'c15.mp3',n:'bolhinhas',k:'h'},
+ {f:'c16.mp3',n:'risos',k:'j'},
+ {f:'c17.mp3',n:'apresentação',k:'k'},
+ {f:'c18.mp3',n:'balões',k:'l'}];
 let modo='int', reversed=false, ctx=null;
 let bus, delayNode, delayFb, delayGain, convolver, revGain;
 const buffers=[], buffersRev=[], loops=new Map(), oneshots=new Set(), teclas=[];
 
 async function initAudio(){
-  if(ctx) return;
-  ctx=new (window.AudioContext||window.webkitAudioContext)();
-  bus=ctx.createGain();
-  // dry
-  bus.connect(ctx.destination);
-  // delay (send)
-  delayNode=ctx.createDelay(2); delayNode.delayTime.value=.35;
-  delayFb=ctx.createGain(); delayFb.gain.value=.45;
-  delayGain=ctx.createGain(); delayGain.gain.value=0;
-  bus.connect(delayNode); delayNode.connect(delayFb); delayFb.connect(delayNode);
-  delayNode.connect(delayGain); delayGain.connect(ctx.destination);
-  // reverb (send) — impulso sintético de 2,5s
-  convolver=ctx.createConvolver();
-  const dur=2.5, rate=ctx.sampleRate, len=dur*rate;
-  const ir=ctx.createBuffer(2,len,rate);
-  for(let c=0;c<2;c++){const d=ir.getChannelData(c);
-    for(let i=0;i<len;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.8);}}
-  convolver.buffer=ir;
-  revGain=ctx.createGain(); revGain.gain.value=0;
-  bus.connect(convolver); convolver.connect(revGain); revGain.connect(ctx.destination);
-  // carregar e inverter buffers
-  for(let i=0;i<SONS.length;i++){
-    const r=await fetch(SONS[i].f); const ab=await r.arrayBuffer();
-    const b=await ctx.decodeAudioData(ab);
-    buffers[i]=b;
-    const rb=ctx.createBuffer(b.numberOfChannels,b.length,b.sampleRate);
-    for(let c=0;c<b.numberOfChannels;c++){
-      const src=b.getChannelData(c), dst=rb.getChannelData(c);
-      for(let j=0;j<b.length;j++) dst[j]=src[b.length-1-j];
-    }
-    buffersRev[i]=rb;
+  if(ctx===null){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    bus=ctx.createGain(); bus.connect(ctx.destination);
+    delayNode=ctx.createDelay(2); delayNode.delayTime.value=.35;
+    delayFb=ctx.createGain(); delayFb.gain.value=.45;
+    delayGain=ctx.createGain(); delayGain.gain.value=0;
+    bus.connect(delayNode); delayNode.connect(delayFb); delayFb.connect(delayNode);
+    delayNode.connect(delayGain); delayGain.connect(ctx.destination);
+    convolver=ctx.createConvolver();
+    const dur=2.5, rate=ctx.sampleRate, len=dur*rate;
+    const ir=ctx.createBuffer(2,len,rate);
+    for(let c=0;c<2;c++){const d=ir.getChannelData(c);
+      for(let i=0;i<len;i++){d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.8);}}
+    convolver.buffer=ir;
+    revGain=ctx.createGain(); revGain.gain.value=0;
+    bus.connect(convolver); convolver.connect(revGain); revGain.connect(ctx.destination);
   }
+  return ctx;
+}
+async function loadBuf(i){
+  if(buffers[i]) return buffers[i];
+  const r=await fetch(SONS[i].f); const ab=await r.arrayBuffer();
+  const b=await ctx.decodeAudioData(ab);
+  buffers[i]=b;
+  const rb=ctx.createBuffer(b.numberOfChannels,b.length,b.sampleRate);
+  for(let c=0;c<b.numberOfChannels;c++){
+    const src=b.getChannelData(c), dst=rb.getChannelData(c);
+    for(let j=0;j<b.length;j++) dst[j]=src[b.length-1-j];
+  }
+  buffersRev[i]=rb;
+  return b;
 }
 function buf(i){return reversed?buffersRev[i]:buffers[i];}
 function voz(i,loop){
@@ -109,6 +120,8 @@ function voz(i,loop){
 }
 async function toca(i){
   await initAudio(); if(ctx.state==='suspended') await ctx.resume();
+  teclas[i].style.opacity=.6;
+  try{ await loadBuf(i); } finally { teclas[i].style.opacity=1; }
   if(modo==='int'){
     if(loops.has(i)){ loops.get(i).stop(); loops.delete(i); teclas[i].classList.remove('ligada'); }
     else{ loops.set(i,voz(i,true)); teclas[i].classList.add('ligada'); }
@@ -119,34 +132,27 @@ async function toca(i){
     setTimeout(()=>teclas[i].classList.remove('premida'),120);
   }
 }
-// teclas de som
 const g=document.getElementById('grelha');
 SONS.forEach((s,i)=>{
   const d=document.createElement('div');
   d.className='tecla';
-  d.innerHTML=`<span class="kbd">${s.k.toUpperCase()}</span><span class="tnum">${i+1}</span><span class="tmeta">soundwalk · ${s.t}</span>`;
+  d.innerHTML=`<span class="kbd">${s.k.toUpperCase()}</span><span class="tnum">${i+1}</span><span class="tmeta">${s.n}</span>`;
   d.addEventListener('pointerdown',()=>toca(i));
   g.appendChild(d); teclas.push(d);
 });
-// efeitos
 const fxD=document.getElementById('fxDelay'), fxR=document.getElementById('fxReverb'), fxV=document.getElementById('fxReverse');
 async function toggleDelay(){ await initAudio();
   const on=fxD.classList.toggle('ligada');
-  delayGain.gain.setTargetAtTime(on?0.7:0, ctx.currentTime, .08);
-}
+  delayGain.gain.setTargetAtTime(on?0.7:0, ctx.currentTime, .08);}
 async function toggleReverb(){ await initAudio();
   const on=fxR.classList.toggle('ligada');
-  revGain.gain.setTargetAtTime(on?0.9:0, ctx.currentTime, .12);
-}
+  revGain.gain.setTargetAtTime(on?0.9:0, ctx.currentTime, .12);}
 async function toggleReverse(){ await initAudio();
   reversed=!fxV.classList.contains('ligada'); fxV.classList.toggle('ligada');
-  // reiniciar loops activos com o buffer invertido
-  [...loops.keys()].forEach(i=>{ loops.get(i).stop(); loops.set(i,voz(i,true)); });
-}
+  [...loops.keys()].forEach(i=>{ loops.get(i).stop(); loops.set(i,voz(i,true)); });}
 fxD.addEventListener('pointerdown',toggleDelay);
 fxR.addEventListener('pointerdown',toggleReverb);
 fxV.addEventListener('pointerdown',toggleReverse);
-// teclado
 document.addEventListener('keydown',ev=>{
   if(ev.repeat)return;
   const k=ev.key.toLowerCase();
@@ -156,7 +162,6 @@ document.addEventListener('keydown',ev=>{
   const i=SONS.findIndex(s=>s.k===k);
   if(i>=0)toca(i);
 });
-// modos e parar
 function pararTudo(){
   loops.forEach((s,i)=>{try{s.stop()}catch(e){} teclas[i].classList.remove('ligada');}); loops.clear();
   oneshots.forEach(s=>{try{s.stop()}catch(e){}}); oneshots.clear();
